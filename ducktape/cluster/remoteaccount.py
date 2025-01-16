@@ -686,9 +686,9 @@ class RemoteAccount(HttpMixin):
     def _get_remote_disk_space(self, dir_path):
         """Check available disk space on the remote system."""
         try:
-            cmd = f"df -k {dir_path} | tail -1 | awk '{{print $4}}'"
+            cmd = f"df -B1 --output=avail {dir_path} | tail -n1 | awk '{{print $1}}'"
             output = self.ssh_output(cmd, allow_fail=False).strip()
-            return int(output) * 1024
+            return int(output)
         except Exception as e:
             raise Exception(f"Failed to retrieve disk space for {dir_path}: {e}")
 
