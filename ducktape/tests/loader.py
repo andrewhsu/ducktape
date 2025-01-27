@@ -23,6 +23,7 @@ import itertools
 import os
 import re
 from typing import List
+import traceback
 
 import requests
 import yaml
@@ -287,6 +288,7 @@ class TestLoader(object):
                 self.logger.debug("Successfully imported " + module_name)
                 return module_and_file
             except Exception as e:
+                exc_info = sys.exc_info()
                 # Because of the way we are searching for
                 # valid modules in this loop, we expect some of the
                 # module names we construct to fail to import.
@@ -320,14 +322,15 @@ class TestLoader(object):
                             missing_module_pieces = missing_module.split(".")
                             expected_error = (missing_module_pieces == path_pieces[-len(missing_module_pieces):])
 
+                exception_message_with_traceback = ''.join(traceback.format_exception(*exc_info))
                 if expected_error:
                     self.logger.debug(
                         "Failed to import %s. This is likely an artifact of the "
-                        "ducktape module loading process: %s: %s", module_name, e.__class__.__name__, e)
+                        "ducktape module loading process: %s", module_name, exception_message_with_traceback)
                 else:
                     self.logger.error(
                         "Failed to import %s, which may indicate a "
-                        "broken test that cannot be loaded: %s: %s", module_name, e.__class__.__name__, e)
+                        "broken test that cannot be loaded: %s", module_name, exception_message_with_traceback)
             finally:
                 path_pieces = path_pieces[1:]
 
