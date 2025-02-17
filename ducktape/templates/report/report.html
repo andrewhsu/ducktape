@@ -134,7 +134,7 @@
               <tbody>
                 {this.props.test_status_names.map(function(status_name) {
                   return (
-                    <th colSpan='5' align='center' className={status_name}>{status_name}</th>
+                    <th colSpan='5' align='center' className={status_name + " status_name"}>{status_name}</th>
                   );
                 }, this)}
               </tbody>
