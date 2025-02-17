@@ -28,7 +28,7 @@
               </h1>
               <p>Test Session: {this.props.heading.session}</p>
               <p>Ducktape Version: {this.props.heading.ducktape_version}</p>
-              <p>Command line: {this.props.heading.command_line}</p>
+              <p>Command line: <pre className="cmd_line">{this.props.heading.command_line}</pre></p>
             </div>
           );
         }
@@ -170,7 +170,7 @@
       TestPanel = React.createClass({
         render: function() {
           return (
-            <div>
+            <div className="test_panel">
               <h2>{this.props.title}</h2>
               <TestTable tests={this.props.tests}/>
             </div>

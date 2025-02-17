@@ -1,6 +1,8 @@
 body { 
     font-family: verdana, arial, helvetica, sans-serif; 
-    font-size: 80%; 
+    font-size: 80%;
+    padding: 0;
+    margin: 0;
 }
 
 table { 
@@ -9,6 +11,19 @@ table {
 
 h1, h2, h3, h4, h5, h6 {
     color: gray;
+}
+
+#heading, #summary_panel, #color_key_panel {
+    margin: 0 10px;
+}
+
+.test_panel h2 {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.cmd_line {
+    overflow: scroll;
 }
 
 #summary_header_row {
@@ -52,7 +67,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .report_table {
-    width: 80%;
+    width: 100%;
     border-collapse: collapse;
     border: 1px solid #777;
 }
