@@ -90,7 +90,7 @@
               <td colSpan='5' align='center'><pre>{this.props.test.test_name}</pre></td>
               <td colSpan='5' align='center'><pre>{this.props.test.description}</pre></td>
               <td colSpan='5' align='center'><pre>{this.props.test.run_time}</pre></td>
-              <td colSpan='5' align='center'><pre>{this.props.test.data}</pre></td>
+              {this.props.render_data_col && <td colSpan='5' align='center'><pre>{this.props.test.data}</pre></td>}
               <td colSpan='5' align='center'><pre className="pre_stack_trace">{this.props.test.summary}</pre></td>
               {detailCol}
             </tr>
@@ -102,6 +102,8 @@
 
       var TestTable = React.createClass({
         render: function() {
+          const render_data_col = this.props.tests.some(test => test.data !== '');
+
           return (
             <table className="report_table">
               <thead>
@@ -109,7 +111,7 @@
                   <th colSpan='5' align='center'>Test</th>
                   <th colSpan='5' align='center'>Description</th>
                   <th colSpan='5' align='center'>Time</th>
-                  <th colSpan='5' align='center'>Data</th>
+                  {render_data_col && <th colSpan='5' align='center'>Data</th>}
                   <th colSpan='5' align='center'>Summary</th>
                   <th colSpan='5' align='center'>Detail</th>
                 </tr>
@@ -117,7 +119,7 @@
               <tbody>
                 {this.props.tests.map(function(test) {
                   return (
-                    <TestRow test={test} /> 
+                    <TestRow test={test} render_data_col={render_data_col} />
                   );
                 }, this)}
               </tbody>
