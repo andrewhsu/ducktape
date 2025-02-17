@@ -75,7 +75,14 @@ h1, h2, h3, h4, h5, h6 {
 .report_table td {
     border: 1px solid #777;
     padding: 2px;
+    vertical-align: top;
 }
+
+.report_table td > * {
+    top: 2px;
+    position: sticky;
+}
+
 
 .pass {
     background-color: #6c6;
