@@ -20,6 +20,7 @@ import re
 import shutil
 import sys
 import tempfile
+import textwrap
 
 from ducktape.cluster.cluster_spec import ClusterSpec
 from ducktape.tests.loggermaker import LoggerMaker, close_logger
@@ -407,9 +408,9 @@ class TestContext(object):
         If the function has a docstring, return that, otherwise return the class docstring or "".
         """
         if self.function.__doc__:
-            return self.function.__doc__
+            return textwrap.dedent(self.function.__doc__).strip('\n')
         elif self.cls.__doc__ is not None:
-            return self.cls.__doc__
+            return textwrap.dedent(self.cls.__doc__).strip('\n')
         else:
             return ""
 

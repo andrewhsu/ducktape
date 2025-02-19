@@ -34,6 +34,15 @@ class DummyTest(Test):
         """function description"""
         pass
 
+    def test_multiline_function_description(self):
+        """
+        function description
+        with multiple lines, including
+        leading and trailing whitespace
+
+        """
+        pass
+
 
 class DummyTestNoDescription(Test):
     def test_this(self):
@@ -80,6 +89,12 @@ class CheckDescription(object):
         context = TestContext(session_context=ducktape_mock.session_context(),
                               cls=DummyTest, function=DummyTest.test_function_description)
         assert context.description == "function description"
+
+    def check_from_function_multiline(self):
+        """If the function has a docstring, the description should come from the function"""
+        context = TestContext(session_context=ducktape_mock.session_context(),
+                              cls=DummyTest, function=DummyTest.test_multiline_function_description)
+        assert context.description == "function description\nwith multiple lines, including\nleading and trailing whitespace"
 
     def check_from_class(self):
         """If the test method has no docstring, description should come from the class docstring"""

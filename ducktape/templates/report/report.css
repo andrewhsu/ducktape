@@ -1,6 +1,25 @@
+:root {
+    --background: #fff;
+    --foreground: #000;
+    --header-color: gray;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #333;
+        --foreground: #fff;
+        --header-color: #ddd;
+    }
+}
+
 body { 
     font-family: verdana, arial, helvetica, sans-serif; 
-    font-size: 80%; 
+    font-size: 80%;
+    padding: 0;
+    margin: 0;
+
+    background-color: var(--background);
+    color: var(--foreground);
 }
 
 table { 
@@ -8,7 +27,20 @@ table {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: gray;
+    color: var(--header-color);
+}
+
+#heading, #summary_panel, #color_key_panel {
+    margin: 0 10px;
+}
+
+.test_panel h2 {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.cmd_line {
+    overflow: scroll;
 }
 
 #summary_header_row {
@@ -52,14 +84,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .report_table {
-    width: 80%;
+    width: 100%;
     border-collapse: collapse;
     border: 1px solid #777;
 }
 
 .report_table td {
     border: 1px solid #777;
+    color: black;
     padding: 2px;
+    vertical-align: top;
+}
+
+.report_table td > * {
+    top: 2px;
+    position: sticky;
+}
+
+.status_name {
+    font-weight: normal;
+    padding: 4px;
+    color: #fff;
 }
 
 .pass {
@@ -68,6 +113,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .flaky {
     background-color: #dd2;
+    color: #222;
 }
 
 .fail {
