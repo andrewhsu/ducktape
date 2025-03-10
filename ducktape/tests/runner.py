@@ -88,6 +88,7 @@ class TestRunner(object):
     stop_testing = False
 
     def __init__(self, cluster, session_context, session_logger, tests, deflake_num,
+                 deflake_exclude_exceptions=[],
                  min_port=ConsoleDefaults.TEST_DRIVER_MIN_PORT,
                  max_port=ConsoleDefaults.TEST_DRIVER_MAX_PORT,
                  finish_join_timeout=DEFAULT_MP_JOIN_TIMEOUT):
@@ -106,6 +107,7 @@ class TestRunner(object):
         self.receiver = Receiver(min_port, max_port)
 
         self.deflake_num = deflake_num
+        self.deflake_exclude_exceptions = deflake_exclude_exceptions
 
         self.session_context = session_context
         self.max_parallel = session_context.max_parallel
@@ -312,7 +314,8 @@ class TestRunner(object):
                 TestContext.results_dir(test_context, current_test_counter),
                 self.session_context.debug,
                 self.session_context.fail_bad_cluster_utilization,
-                self.deflake_num
+                self.deflake_num,
+                self.deflake_exclude_exceptions
             ])
 
         self._client_procs[test_key] = proc
