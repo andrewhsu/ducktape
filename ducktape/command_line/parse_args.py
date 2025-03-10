@@ -100,6 +100,9 @@ def create_ducktape_parser():
                              "to determine flakyness. When not present, deflake will not be used, "
                              "and a test will be marked as either passed or failed. "
                              "When enabled tests will be marked as flaky if it passes on any of the reruns")
+    parser.add_argument("--deflake-exclude-exceptions", type=str, default="",
+                        help="comma separated exception names to exclude from deflake. "
+                             "applies when --deflake > 1")
     parser.add_argument("--allow-empty-tests-list", action="store_true",
                         default=os.environ.get("DUCKTAPE_ALLOW_EMPTY_TESTS_LIST", "0").lower() in ("1", "true", "yes"),
                         help="Proceeds without failing when no tests are loaded ")
@@ -207,4 +210,7 @@ def parse_args(args):
     if parsed_args_dict["version"]:
         print(ducktape_version())
         sys.exit(0)
+    # make list of deflake exclude exceptions
+    if parsed_args_dict["deflake_exclude_exceptions"]:
+        parsed_args_dict["deflake_exclude_exceptions"] = [d for d in str(parsed_args_dict["deflake_exclude_exceptions"]).split(",") if d]
     return parsed_args_dict
