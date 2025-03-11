@@ -321,7 +321,9 @@ class RunnerClient(object):
             sub_summaries.append(sub_summary)
 
         if test_status == FLAKY:
-            sub_summaries.append([f"run {len(run_summaries)}: PASSED"])
+            # Successful run does not have a summary, so count one extra run
+            # and generate a manual summary.
+            sub_summaries.append([f"run {len(run_summaries) + 1}: PASSED"])
 
         # combine summaries, with a '~~~~~' divider
         for sub_summary in sub_summaries[:-1]:
