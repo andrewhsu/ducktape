@@ -133,6 +133,7 @@ class RunnerClient(object):
     # configs
     fail_bad_cluster_utilization: bool
     deflake_num: int
+    deflake_exlude_exceptions: List[str]|None
 
     def __init__(
         self,
@@ -144,7 +145,8 @@ class RunnerClient(object):
         log_dir: str,
         debug: bool,
         fail_bad_cluster_utilization: bool,
-        deflake_num: int
+        deflake_num: int,
+        deflake_exlude_exceptions: List[str]|None=None
     ):
         signal.signal(signal.SIGTERM, self._sigterm_handler)  # register a SIGTERM handler
 
@@ -160,6 +162,9 @@ class RunnerClient(object):
         self.sender = Sender(server_hostname, str(self.runner_port), self.message, self.logger)
 
         self.deflake_num = deflake_num
+        if deflake_exlude_exceptions is None:
+            deflake_exlude_exceptions = []
+        self.deflake_exlude_exceptions = deflake_exlude_exceptions
 
         # Wait to instantiate the test object until running the test
         self.test = None
@@ -169,6 +174,13 @@ class RunnerClient(object):
     @property
     def deflake_enabled(self) -> bool:
         return self.deflake_num > 1
+
+    def stop_deflake_retries(self, summary: str):
+        for e in self.deflake_exlude_exceptions:
+            # e.g. 'NodeCrash' or '<NodeCrash'
+            if summary.startswith(e) or summary.startswith(f"<{e}"):
+                return True
+        return False
 
     def ready(self):
         ready_reply = self.sender.send(self.message.ready())
@@ -236,6 +248,7 @@ class RunnerClient(object):
 
         try:
             while test_status == FAIL and num_runs < self.deflake_num:
+                stopped_deflake = False
                 num_runs += 1
                 self.log(logging.INFO, "on run {}/{}".format(num_runs, self.deflake_num))
                 start_time = time.time()
@@ -255,10 +268,15 @@ class RunnerClient(object):
                 if run_summary:
                     msg += ": {}".format("\n".join(run_summary))
                 self.log(logging.INFO, msg)
+                if test_status == FAIL and run_summary:
+                    if self.deflake_enabled and self.stop_deflake_retries("\n".join(run_summary)):
+                        self.log(logging.INFO, "exception matches deflake exclude exceptions. stopping deflake retries...")
+                        stopped_deflake = True
+                        break
 
         finally:
             stop_time = time.time()
-            summary = self.process_run_summaries(summaries, test_status)
+            summary = self.process_run_summaries(summaries, test_status, stopped_deflake)
             test_status, summary = self._check_cluster_utilization(test_status, summary)
             # convert summary from list to string
             summary = "\n".join(summary)
@@ -290,7 +308,7 @@ class RunnerClient(object):
             self.test_context = None
             self.test = None
 
-    def process_run_summaries(self, run_summaries: List[List[str]], test_status: TestStatus) -> List[str]:
+    def process_run_summaries(self, run_summaries: List[List[str]], test_status: TestStatus, stopped_deflake = False) -> List[str]:
         """
         Converts individual run summaries (there may be multiple if deflake is enabled)
         into a single run summary
@@ -300,6 +318,8 @@ class RunnerClient(object):
             return ["Test Passed"]
         # single run, can just return the summary
         if not self.deflake_enabled:
+            return run_summaries[0]
+        if stopped_deflake:
             return run_summaries[0]
 
         failure_summaries: Mapping[str: List[int]] = defaultdict(list)
